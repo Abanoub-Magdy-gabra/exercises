@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -8,16 +7,19 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# نسخ ملف المشروع
-COPY Workout.csproj .
+# انسخ ملف المشروع من فولدر WebApplication1
+COPY WebApplication1/Workout.csproj WebApplication1/
 
 # استرجاع الحزم
-RUN dotnet restore "Workout.csproj"
+RUN dotnet restore "WebApplication1/Workout.csproj"
 
-# نسخ باقي الملفات
+# انسخ باقي الملفات
 COPY . .
 
-# بناء المشروع (هنا احنا لسه في /src)
+# ادخل على فولدر المشروع
+WORKDIR /src/WebApplication1
+
+# بناء المشروع
 RUN dotnet build "Workout.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
